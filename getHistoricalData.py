@@ -4,13 +4,13 @@ def processJson(inputFile,outputFile):
 	fout = open(outputFile,'w')
 	lines = fin.readlines()
 	newLine = lines[lines.__len__() - 1: lines.__len__() - 8002: -1]
-	fout.write('[')
+	#fout.write('[')
 	
 	for i in range(0, newLine.__len__() - 2):
 		fout.writelines(newLine[i])
-		fout.write(',')
+		#fout.write(',')
 	fout.writelines(newLine[newLine.__len__() -1 ])
-	fout.write(']')
+	#fout.write(']')
 
 	fin.close()
 	fout.close()
