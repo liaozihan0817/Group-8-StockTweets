@@ -4,7 +4,7 @@ def processJson(inputFile,outputFile):
 	fout = open(outputFile,'w')
 	lines = fin.readlines()
 	fout.write('[')
-	for i in range(0,99):
+	for i in range(0,9999):
 		fout.writelines(lines[i])
 		fout.write(',')
 	fout.writelins(lines[100])

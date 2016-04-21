@@ -1,10 +1,9 @@
 <html>
     <script src="http://d3js.org/d3.v3.min.js" charset"utf-8"></script>
 <body>
-    <svg>
-    </svg>
     
-    </body>
+    
+</body>
 <script>
     var b = d3.rgb(255,0,0);
 var a = d3.rgb(0,255,0);
@@ -12,6 +11,7 @@ var a = d3.rgb(0,255,0);
 	height = 400;
 	
 var svg = d3.select("body").append("svg")
+    .attr("id", "sentimentBar")
 	.attr("width", width)
 	.attr("height", height);
     var defs = svg.append("defs");
