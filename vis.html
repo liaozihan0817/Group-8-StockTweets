@@ -107,6 +107,15 @@
         .attr("width", function(d) { return d.dx; })
         .attr("height", function(d) { return d.dy; })
         .attr("fill", function(d){return d.children ? null:color(d.parent.name); })
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+        .on('mouseover',function(d){ tempcolor=this.style.fill;
+     d3.select(this).transition().delay(100).duration(500).style('opacity',0.8)})
+        .on('mouseout',function(d){d3.select(this).transition().delay(500).duration(100).style('opacity',1).style('fill',tempcolor)});
+=======
+>>>>>>> origin/master
+>>>>>>> Stashed changes
 
 
         cells.append("text")
