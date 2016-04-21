@@ -1,0 +1,226 @@
+<html>
+    <head>
+        <title> Stocktwits monitor </title>
+        <style>
+            li {
+                list-style: none;
+            }
+            #streamList {
+                list-style: none;
+                padding: 10;
+
+                width:600;
+            }
+            .message  {
+                list-style: none;
+                padding: 15;
+                float:left;
+                font-size:14;
+            }
+            .time, .sentiment {
+                list-style: none;
+                padding-top: 10;
+                color:darkblue;
+                font-size:12;
+            }
+            #stream{
+                transform:translate(520px,0);
+                overflow-y: visible;
+            }
+            #streamList {
+                height: 440;
+                width: 650;
+                overflow-y: scroll;
+            }
+            #heatmap{
+                position:absolute;
+                top:20px;
+                left:20px;
+            }
+            #container{
+                position:absolute;
+                top:540px;
+                left:20px;
+            }
+            #sentiment {
+                width:500;
+                height:100;
+                position:absolute;
+                top: 300;
+                left: 600;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="width: 700px;" style="height: 400px;"  id = "stream"><li id="streamList">
+            
+        <li></div>
+        
+    <div id="heatmap"></div>
+    <div id="container" style="height: 300px; width:700px"></div>
+        <div id="sentiment"> </div>
+    </body>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"> </script>
+     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>   
+        <script src="http://code.highcharts.com/stock/highstock.js"></script>
+    <script>
+        var list = d3.select("#streamList");
+        
+        function renderList(data) {
+            //console.log(data);
+            
+            
+            list.selectAll("li")
+                .data(data)
+                .enter()
+                .append("li")
+                .attr("class", "message")
+                .text(function(d) {return  d.body})
+                .append("li")
+                .attr("class", "time")
+                .html(function(d) {return "Time: " + d.created_at})
+                .append("li")
+                .attr("class", "sentiment")
+                .html(function(d) {return "Sentiment: " + getSentiment(d)});
+        }
+            function getSentiment(data) {
+            if(data.entities.sentiment == null) {
+                return "null";
+            } else {
+                return data.entities.sentiment.basic;
+            }
+        }
+        
+        d3.json('https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-8-StockTweets/master/streamList.json', function(error, result){
+            renderList(result);
+        })
+        
+        //treemap
+    var color = d3.scale.category10();
+    var canvas = d3.select("#heatmap").append("svg")
+                .attr("width",500)
+                .attr("height",500);
+
+    d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-8-StockTweets/master/TreemapDict.json" ,function(data){
+
+        var treemap=d3.layout.treemap()
+        .size([500,500])
+        .nodes(data);
+
+        console.log(treemap);
+
+
+    var cells = canvas.selectAll(".cell")
+                .style("position", "relative")
+                .data(treemap)
+                .enter()
+                .append("g")
+                .attr("class","cell")
+                .attr("stroke","#fff");
+
+        cells.append("rect")
+        .attr( "x" , function(d) { console.log(d); return d.x; })
+        .attr("y", function(d) { return d.y; })
+        .attr("width", function(d) { return d.dx; })
+        .attr("height", function(d) { return d.dy; })
+        .attr("fill", function(d){return d.children ? null:color(d.parent.name); })
+
+        .on('mouseover',function(d){ tempcolor=this.style.fill;
+     d3.select(this).transition().delay(100).duration(500).style('opacity',0.8)})
+        .on('mouseout',function(d){d3.select(this).transition().delay(500).duration(100).style('opacity',1).style('fill',tempcolor)});
+
+
+        cells.append("text")
+        .attr("x",function(d) {return d.x + d.dx/2})
+        .attr("y",function(d) {return d.y + d.dy/2})
+        .attr("text-anchor","middle")
+        .text(function(d){ return d.children? null :d.name;})
+    })
+    //stockprice
+    $(function () {
+
+    $.getJSON("https://query.yahooapis.com/v1/public/yql?q=" + encodeURIComponent("select Date, Open, High, Low, Close from csv where url='http://real-chart.finance.yahoo.com/table.csv?s=AAPL&d=3&e=20&f=2016&g=d&a=3&b=27&c=2015&ignore=.csv' and columns='Date,Open,High,Low,Close,Volume,Adj Close'") + "&format=json&callback=?", function (data) {
+        
+        //console.log(data.query.results);
+        var data = data.query.results.row;
+        data = data.splice(1, data.length);
+        //console.log(data);
+        
+        var processedData = [];
+        $(data).each(function(index, value) {
+           //console.log(Date.parse(value.Date).getTime());
+           //console.log(Date.parse(value.Date));
+            processedData.push([Date.parse(value.Date), parseFloat(value.Open), parseFloat(value.High), parseFloat(value.Low), parseFloat(value.Close)]);
+        });
+        processedData = processedData.reverse();
+        //console.log(processedData);
+        
+        // Create the chart
+        $('#container').highcharts('StockChart', {
+
+
+            rangeSelector : {
+                selected : 1
+            },
+
+            title : {
+                text : 'AAPL Stock Price'
+            },
+
+            series : [{
+                type : 'candlestick',
+                name : 'AAPL Stock Price',
+                data : processedData,
+                tooltip: {
+                    valueDecimals: 2
+                    }
+                }]
+            });
+        });
+
+    });
+    
+        
+     d3.json('sentimentList.json', function(error, result){
+            //renderSentiment(result);
+        })
+        
+        
+        
+        var b = d3.rgb(255,0,0);
+        var a = d3.rgb(0,255,0);
+        
+	
+        var svg = d3.select("#sentiment").append("svg")
+            .attr("id", "sentimentBar")
+	       .attr("width", 400)
+	       .attr("height", 300);
+        var defs = svg.append("defs");
+
+        var linearGradient = defs.append("linearGradient")
+						.attr("id","linearColor")
+						.attr("x1","0%")
+						.attr("y1","0%")
+						.attr("x2","100%")
+						.attr("y2","0%");
+
+        var stop1 = linearGradient.append("stop")
+				.attr("offset","0%")
+				.style("stop-color",a.toString());
+
+        var stop2 = linearGradient.append("stop")
+				.attr("offset","100%")
+				.style("stop-color",b.toString());
+
+
+        var colorRect = svg.append("rect")
+				.attr("x", 15)
+				.attr("y", 200)
+				.attr("width", 350)
+				.attr("height", 30)
+				.style("fill","url(#" + linearGradient.attr("id") + ")");
+    </script>
+
+
+
+</html>

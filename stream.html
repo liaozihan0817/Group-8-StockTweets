@@ -6,11 +6,19 @@
                 list-style: none;
                 padding: 10;
                 float:left;
+                width:600;
             }
-            .listItem {
+            .message  {
                 list-style: none;
-                padding: 10;
+                padding: 15;
                 float:left;
+                font-size:14;
+            }
+            .time, .sentiment {
+                list-style: none;
+                padding-top: 10;
+                color:darkblue;
+                font-size:12;
             }
         </style>
     </head>
@@ -33,11 +41,35 @@
             list.selectAll("li")
                 .data(data)
                 .enter()
-                .insert("li")
-                .attr("class", "listItem")
-                .text(function(d) {return  d.body});
+                .append("li")
+                .attr("class", "message")
+                .text(function(d) {return  d.body})
+                .append("li")
+                .attr("class", "time")
+                .html(function(d) {return "Time: " + d.created_at})
+                .append("li")
+                .attr("class", "sentiment")
+                .html(function(d) {return "Sentiment: " + getSentiment(d)});
+//                .append("li")
+//                .attr("class", "symbol")
+//                .html(function(d) {return "Symbol: " + getSymbol(d)});
+                
+                
         }
         
+//        function getSymbol(data) {
+//            var syb = d3.select('.symbol');
+//            syb.data(data).enter().append()
+//                .html(function(d) {d.symbol + "&nbsp&nbsp"});
+//            return syb;
+//        }
+        function getSentiment(data) {
+            if(data.entities.sentiment == null) {
+                return "null";
+            } else {
+                return data.entities.sentiment.basic;
+            }
+        }
         d3.json('streamList.json', function(error, result){
             renderList(result);
         })
