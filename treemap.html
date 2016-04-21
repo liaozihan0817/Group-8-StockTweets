@@ -10,7 +10,7 @@
                 .attr("width",500)
                 .attr("height",500);
 
-    d3.json("TreeDict.json" ,function(data){
+    d3.json("https://raw.githubusercontent.com/NYU-CS6313-SPRING2016/Group-8-StockTweets/master/TreemapDict.json" ,function(data){
 
         var treemap=d3.layout.treemap()
         .size([500,500])
@@ -39,7 +39,7 @@
         .attr("x",function(d) {return d.x + d.dx/2})
         .attr("y",function(d) {return d.y + d.dy/2})
         .attr("text-anchor","middle")
-        .text(function(d){ return d.children? null :d.symbol;})
+        .text(function(d){ return d.children? null :d.name;})
     })
 </script>
 </div>
