@@ -1,0 +1,47 @@
+<html>
+    <head></head>
+<body>
+    <script src="http://d3js.org/d3.v3.min.js" charset"utf-8"></script>
+<div id="heatmap">
+<script>
+
+    var color = d3.scale.category10();
+    var canvas = d3.select("#heatmap").append("svg")
+                .attr("width",500)
+                .attr("height",500);
+
+    d3.json("TreeDict.json" ,function(data){
+
+        var treemap=d3.layout.treemap()
+        .size([500,500])
+        .nodes(data);
+
+        console.log(treemap);
+
+
+    var cells = canvas.selectAll(".cell")
+                .style("position", "relative")
+                .data(treemap)
+                .enter()
+                .append("g")
+                .attr("class","cell")
+                .attr("stroke","#fff");
+
+        cells.append("rect")
+        .attr( "x" , function(d) { console.log(d); return d.x; })
+        .attr("y", function(d) { return d.y; })
+        .attr("width", function(d) { return d.dx; })
+        .attr("height", function(d) { return d.dy; })
+        .attr("fill", function(d){return d.children ? null:color(d.parent.name); })
+
+
+        cells.append("text")
+        .attr("x",function(d) {return d.x + d.dx/2})
+        .attr("y",function(d) {return d.y + d.dy/2})
+        .attr("text-anchor","middle")
+        .text(function(d){ return d.children? null :d.symbol;})
+    })
+</script>
+</div>
+</body>
+</html>
