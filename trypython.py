@@ -44,11 +44,11 @@ for TICKER in symbolDict:
 #for ticker in symbolDict:
 #    print (symbolDict[ticker]["symbol"], symbolDict[ticker]["count"])    #print generated symbolDict
 
-with open('symbolDict.json', 'w') as f:
+#with open('symbolDict.json', 'w') as f:
 #    json.dump(symbolDict, f, sort_keys=True, indent=4)
-    for item in symbolDict.items():
-        json.dump(item, f)
-        f.write('\n')
+#    for item in symbolDict.items():
+#        json.dump(item, f)
+#        f.write('\n')
 
 symbolList.sort(key = lambda x: x.count, reverse = True)
 #print (symbolList)
