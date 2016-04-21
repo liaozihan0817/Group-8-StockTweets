@@ -42,6 +42,13 @@
                 top:540px;
                 left:20px;
             }
+            #sentiment {
+                width:500;
+                height:100;
+                position:absolute;
+                top: 300;
+                left: 600;
+            }
         </style>
     </head>
     <body>
@@ -51,8 +58,9 @@
         
     <div id="heatmap"></div>
     <div id="container" style="height: 300px; width:700px"></div>
+        <div id="sentiment"> </div>
     </body>
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"> </script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"> </script>
      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>   
         <script src="http://code.highcharts.com/stock/highstock.js"></script>
     <script>
@@ -165,13 +173,52 @@
                 data : processedData,
                 tooltip: {
                     valueDecimals: 2
-                }
-            }]
+                    }
+                }]
+            });
         });
+
     });
+    
+        
+     d3.json('sentimentList.json', function(error, result){
+            //renderSentiment(result);
+        })
+        
+        
+        
+        var b = d3.rgb(255,0,0);
+        var a = d3.rgb(0,255,0);
+        
+	
+        var svg = d3.select("#sentiment").append("svg")
+            .attr("id", "sentimentBar")
+	       .attr("width", 400)
+	       .attr("height", 300);
+        var defs = svg.append("defs");
 
-});
+        var linearGradient = defs.append("linearGradient")
+						.attr("id","linearColor")
+						.attr("x1","0%")
+						.attr("y1","0%")
+						.attr("x2","100%")
+						.attr("y2","0%");
 
+        var stop1 = linearGradient.append("stop")
+				.attr("offset","0%")
+				.style("stop-color",a.toString());
+
+        var stop2 = linearGradient.append("stop")
+				.attr("offset","100%")
+				.style("stop-color",b.toString());
+
+
+        var colorRect = svg.append("rect")
+				.attr("x", 15)
+				.attr("y", 200)
+				.attr("width", 350)
+				.attr("height", 30)
+				.style("fill","url(#" + linearGradient.attr("id") + ")");
     </script>
 
 
