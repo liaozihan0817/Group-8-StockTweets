@@ -2,6 +2,9 @@
     <head>
         <title> Stocktwits monitor </title>
         <style>
+            li {
+                list-style: none;
+            }
             #streamList {
                 list-style: none;
                 padding: 10;
@@ -21,7 +24,13 @@
                 font-size:12;
             }
             #stream{
-                transform:translate(700px,0)
+                transform:translate(520px,0);
+                overflow-y: visible;
+            }
+            #streamList {
+                height: 440;
+                width: 650;
+                overflow-y: scroll;
             }
             #heatmap{
                 position:absolute;
@@ -36,12 +45,12 @@
         </style>
     </head>
     <body>
-        <div style="width: 35px;" style="height: 400px;" id = "stream"><li id="streamList">
+        <div style="width: 700px;" style="height: 400px;"  id = "stream"><li id="streamList">
             
         <li></div>
         
     <div id="heatmap"></div>
-    <div id="container" style="height: 400px; width:600px"></div>
+    <div id="container" style="height: 300px; width:700px"></div>
     </body>
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"> </script>
      <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>   
@@ -79,7 +88,7 @@
         })
         
         //treemap
-     var color = d3.scale.category10();
+    var color = d3.scale.category10();
     var canvas = d3.select("#heatmap").append("svg")
                 .attr("width",500)
                 .attr("height",500);
@@ -107,15 +116,10 @@
         .attr("width", function(d) { return d.dx; })
         .attr("height", function(d) { return d.dy; })
         .attr("fill", function(d){return d.children ? null:color(d.parent.name); })
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
+
         .on('mouseover',function(d){ tempcolor=this.style.fill;
      d3.select(this).transition().delay(100).duration(500).style('opacity',0.8)})
         .on('mouseout',function(d){d3.select(this).transition().delay(500).duration(100).style('opacity',1).style('fill',tempcolor)});
-=======
->>>>>>> origin/master
->>>>>>> Stashed changes
 
 
         cells.append("text")
