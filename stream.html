@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <title>Stream Data</title>
+        <style>
+            #streamList {
+                list-style: none;
+                padding: 10;
+                float:left;
+            }
+            .listItem {
+                list-style: none;
+                padding: 10;
+                float:left;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <li id="streamList">
+            
+        <li>
+        
+    </body>
+    
+    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"> </script>
+    <script>
+        var list = d3.select("#streamList");
+        
+        function renderList(data) {
+            //console.log(data);
+            
+            
+            list.selectAll("li")
+                .data(data)
+                .enter()
+                .insert("li")
+                .attr("class", "listItem")
+                .text(function(d) {return  d.body});
+        }
+        
+        d3.json('streamList.json', function(error, result){
+            renderList(result);
+        })
+    </script>
+    
+</html>
