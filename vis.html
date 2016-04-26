@@ -135,51 +135,61 @@
         .attr("y",function(d) {return d.y + d.dy/2})
         .attr("text-anchor","middle")
         .text(function(d){ return d.children? null :d.name;})
+        .on("click", function(d) {renderStock(d.name);})
     })
     //stockprice
-    $(function () {
-
-    $.getJSON("https://query.yahooapis.com/v1/public/yql?q=" + encodeURIComponent("select Date, Open, High, Low, Close from csv where url='http://real-chart.finance.yahoo.com/table.csv?s=AAPL&d=3&e=20&f=2016&g=d&a=3&b=27&c=2015&ignore=.csv' and columns='Date,Open,High,Low,Close,Volume,Adj Close'") + "&format=json&callback=?", function (data) {
+    var symbol = "FB";
         
-        //console.log(data.query.results);
-        var data = data.query.results.row;
-        data = data.splice(1, data.length);
-        //console.log(data);
+    function renderStock(symbol) {
         
-        var processedData = [];
-        $(data).each(function(index, value) {
-           //console.log(Date.parse(value.Date).getTime());
-           //console.log(Date.parse(value.Date));
-            processedData.push([Date.parse(value.Date), parseFloat(value.Open), parseFloat(value.High), parseFloat(value.Low), parseFloat(value.Close)]);
-        });
-        processedData = processedData.reverse();
-        //console.log(processedData);
-        
-        // Create the chart
-        $('#container').highcharts('StockChart', {
+        var uriString = "select Date, Open, High, Low, Close from csv where url='http://real-chart.finance.yahoo.com/table.csv?s=" + symbol +"&d=3&e=20&f=2016&g=d&a=3&b=27&c=2015&ignore=.csv' and columns='Date,Open,High,Low,Close,Volume,Adj Close'";
 
+        $(function () {
 
-            rangeSelector : {
-                selected : 1
-            },
+        $.getJSON("https://query.yahooapis.com/v1/public/yql?q=" + encodeURIComponent(uriString) + "&format=json&callback=?", function (data) {
 
-            title : {
-                text : 'AAPL Stock Price'
-            },
+            //console.log(data.query.results);
+            var data = data.query.results.row;
+            data = data.splice(1, data.length);
+            //console.log(data);
 
-            series : [{
-                type : 'candlestick',
-                name : 'AAPL Stock Price',
-                data : processedData,
-                tooltip: {
-                    valueDecimals: 2
-                    }
-                }]
+            var processedData = [];
+            $(data).each(function(index, value) {
+               //console.log(Date.parse(value.Date).getTime());
+               //console.log(Date.parse(value.Date));
+                processedData.push([Date.parse(value.Date), parseFloat(value.Open), parseFloat(value.High), parseFloat(value.Low), parseFloat(value.Close)]);
             });
+            processedData = processedData.reverse();
+            //console.log(processedData);
+
+            // Create the chart
+            $('#container').highcharts('StockChart', {
+
+
+                rangeSelector : {
+                    selected : 1
+                },
+
+                title : {
+                    text : symbol + ' Stock Price'
+                },
+
+                series : [{
+                    type : 'candlestick',
+                    name : symbol + ' Stock Price',
+                    data : processedData,
+                    tooltip: {
+                        valueDecimals: 2
+                        }
+                    }]
+                });
+            });
+
         });
 
-    });
-    
+    }
+        
+    renderStock(symbol)
         
      d3.json('sentimentList.json', function(error, result){
             //renderSentiment(result);
@@ -190,35 +200,35 @@
         var b = d3.rgb(255,0,0);
         var a = d3.rgb(0,255,0);
         
-	
+    
         var svg = d3.select("#sentiment").append("svg")
             .attr("id", "sentimentBar")
-	       .attr("width", 400)
-	       .attr("height", 300);
+           .attr("width", 400)
+           .attr("height", 300);
         var defs = svg.append("defs");
 
         var linearGradient = defs.append("linearGradient")
-						.attr("id","linearColor")
-						.attr("x1","0%")
-						.attr("y1","0%")
-						.attr("x2","100%")
-						.attr("y2","0%");
+                        .attr("id","linearColor")
+                        .attr("x1","0%")
+                        .attr("y1","0%")
+                        .attr("x2","100%")
+                        .attr("y2","0%");
 
         var stop1 = linearGradient.append("stop")
-				.attr("offset","0%")
-				.style("stop-color",a.toString());
+                .attr("offset","0%")
+                .style("stop-color",a.toString());
 
         var stop2 = linearGradient.append("stop")
-				.attr("offset","100%")
-				.style("stop-color",b.toString());
+                .attr("offset","100%")
+                .style("stop-color",b.toString());
 
 
         var colorRect = svg.append("rect")
-				.attr("x", 15)
-				.attr("y", 200)
-				.attr("width", 350)
-				.attr("height", 30)
-				.style("fill","url(#" + linearGradient.attr("id") + ")");
+                .attr("x", 15)
+                .attr("y", 200)
+                .attr("width", 350)
+                .attr("height", 30)
+                .style("fill","url(#" + linearGradient.attr("id") + ")");
     </script>
 
 
