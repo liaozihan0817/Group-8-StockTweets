@@ -124,7 +124,7 @@
         .attr("width", function(d) { return d.dx; })
         .attr("height", function(d) { return d.dy; })
         .attr("fill", function(d){return d.children ? null:color(d.parent.name); })
-
+        .on("click", function(d) {renderStock(d.name);})
         .on('mouseover',function(d){ tempcolor=this.style.fill;
      d3.select(this).transition().delay(100).duration(500).style('opacity',0.8)})
         .on('mouseout',function(d){d3.select(this).transition().delay(500).duration(100).style('opacity',1).style('fill',tempcolor)});
@@ -136,9 +136,10 @@
         .attr("text-anchor","middle")
         .text(function(d){ return d.children? null :d.name;})
         .on("click", function(d) {renderStock(d.name);})
+        
     })
     //stockprice
-    var symbol = "FB";
+    var symbol;
         
     function renderStock(symbol) {
         
