@@ -51,6 +51,7 @@ for TICKER in symbolDict:
 #        f.write('\n')
 
 symbolList.sort(key = lambda x: x.count, reverse = True)
+#try not convert to object, just use x['count'] to sort next time.
 #print (symbolList)
 
 #for ITEM in symbolList:
