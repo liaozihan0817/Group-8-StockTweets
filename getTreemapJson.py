@@ -18,23 +18,34 @@ for i in range(0, 7999):
 #            print (SYMBOL)  # print the entry for a symbol
 #            print("    ", "symbol_id:", SYMBOL['id'],"    ", "symbol:", SYMBOL['symbol'])
             
-            # calculating message volume of a symbol
+            # counting message volume of a symbol
             if SYMBOL['symbol'] in symbolDict:
                 symbolDict[SYMBOL['symbol']]['count'] += 1
             else:
                 symbolDict[SYMBOL['symbol']] = SYMBOL;
                 symbolDict[SYMBOL['symbol']]['count'] = 1
                 symbolDict[SYMBOL['symbol']]['relatedSymbol'] = {}
+                symbolDict[SYMBOL['symbol']]['sentiment'] = {'bearish': 0, 'bullish': 0, 'unknown': 0}
             
-            # calculating the other symbols mention together
+            # counting the other symbols mention together
             for RELATEDSYMBOLS in data['symbols']:
                 if RELATEDSYMBOLS['symbol'] != SYMBOL['symbol'] and RELATEDSYMBOLS['symbol'] in symbolDict[SYMBOL['symbol']]['relatedSymbol']:
                     symbolDict[SYMBOL['symbol']]['relatedSymbol'][RELATEDSYMBOLS['symbol']] += 1
                 elif RELATEDSYMBOLS['symbol'] != SYMBOL['symbol']:
                     symbolDict[SYMBOL['symbol']]['relatedSymbol'][RELATEDSYMBOLS['symbol']] =1
 
+            # count sentiment value
+            if data['entities']['sentiment'] is not None:
+                if data['entities']['sentiment']['basic'] == "Bearish":
+                    symbolDict[SYMBOL['symbol']]['sentiment']['bearish'] += 1
+                elif data['entities']['sentiment']['basic'] == "Bullish":
+                    symbolDict[SYMBOL['symbol']]['sentiment']['bullish'] += 1
+            else:
+                symbolDict[SYMBOL['symbol']]['sentiment']['unknown'] += 1
+                    
 # convert relatedSymbol subDict to a sorted list relatedSymbolList
 for STOCK in symbolDict:
+    # sorting the related symbol list
     symbolDict[STOCK]['relatedSymbolList'] = []
     for relatedSymbols in symbolDict[STOCK]['relatedSymbol']:
         symbolDict[STOCK]['relatedSymbolList'].append({'name': relatedSymbols,
@@ -42,6 +53,8 @@ for STOCK in symbolDict:
     symbolDict[STOCK]['relatedSymbolList'].sort(key = lambda x: x['relate_count'], reverse = True)
     del symbolDict[STOCK]['relatedSymbolList'][5:]    # truncate relatedSymbolList, leave at most 5 related symbols.
     del symbolDict[STOCK]['relatedSymbol']    # delete a key value pair in dictionary
+    # calculating sentiment value
+    symbolDict[STOCK]['sentiment']['sentiment_value'] = (symbolDict[STOCK]['sentiment']['bullish'] - symbolDict[STOCK]['sentiment']['bearish']) / (symbolDict[STOCK]['sentiment']['bullish'] + symbolDict[STOCK]['sentiment']['bearish'] + symbolDict[STOCK]['sentiment']['unknown']) 
 
 #convert dict to object and store objects into a list
 symbolList = []    #This is a list of objects
@@ -63,11 +76,11 @@ for TICKER in symbolDict:
 #for ticker in symbolDict:
 #    print (symbolDict[ticker]["symbol"], symbolDict[ticker]["count"])    #print generated symbolDict
 
-with open('symbolDict.json', 'w') as f:
-    json.dump(symbolDict, f, sort_keys=True, indent=4)
-    for item in symbolDict.items():
-        json.dump(item, f)
-        f.write('\n')
+#with open('symbolDict.json', 'w') as f:
+#    json.dump(symbolDict, f, sort_keys=True, indent=4)
+#    for item in symbolDict.items():
+#        json.dump(item, f)
+#        f.write('\n')
 
 symbolList.sort(key = lambda x: x.count, reverse = True)
 #try not convert to object, just use x['count'] to sort next time.
@@ -86,6 +99,7 @@ for i in range(0,10):
                                                  'value': symbolDict[symbolList[i].symbol]['count'],
                                                  'title': symbolDict[symbolList[i].symbol]['title'],
                                                  'exchange': symbolDict[symbolList[i].symbol]['exchange'],
+                                                 'sentiment': symbolDict[symbolList[i].symbol]['sentiment'],
                                                  'relatedSymbols': symbolDict[symbolList[i].symbol]['relatedSymbolList']})
 #        sectorDict[symbolList[i].sector].append(symbolDict[symbolList[i].symbol])
     else:
@@ -94,6 +108,7 @@ for i in range(0,10):
                                                  'value': symbolDict[symbolList[i].symbol]['count'],
                                                  'title': symbolDict[symbolList[i].symbol]['title'],
                                                  'exchange': symbolDict[symbolList[i].symbol]['exchange'],
+                                                 'sentiment': symbolDict[symbolList[i].symbol]['sentiment'],
                                                  'relatedSymbols': symbolDict[symbolList[i].symbol]['relatedSymbolList']})
 
 #print ("sectorDict length:", len(sectorDict))
