@@ -8,7 +8,7 @@ treeDict = {'name': "treemap", 'children': []}
 
 #print ("Display created empty symbolDict:", symbolDict)
 
-for i in range(0, 1999):
+for i in range(0, 7999):
     data = json.loads(lines[i])
 #    print("\nmessage_id:", data['id'])
 #    print (data.keys())  # print the keys of a message
@@ -17,12 +17,30 @@ for i in range(0, 1999):
 #            print (SYMBOL.keys())  # print the keys of a symbol
 #            print (SYMBOL)  # print the entry for a symbol
 #            print("    ", "symbol_id:", SYMBOL['id'],"    ", "symbol:", SYMBOL['symbol'])
-
+            
+            # calculating message volume of a symbol
             if SYMBOL['symbol'] in symbolDict:
                 symbolDict[SYMBOL['symbol']]['count'] += 1
             else:
                 symbolDict[SYMBOL['symbol']] = SYMBOL;
                 symbolDict[SYMBOL['symbol']]['count'] = 1
+                symbolDict[SYMBOL['symbol']]['relatedSymbol'] = {}
+            
+            # calculating the other symbols mention together
+            for RELATEDSYMBOLS in data['symbols']:
+                if RELATEDSYMBOLS['symbol'] != SYMBOL['symbol'] and RELATEDSYMBOLS['symbol'] in symbolDict[SYMBOL['symbol']]['relatedSymbol']:
+                    symbolDict[SYMBOL['symbol']]['relatedSymbol'][RELATEDSYMBOLS['symbol']] += 1
+                elif RELATEDSYMBOLS['symbol'] != SYMBOL['symbol']:
+                    symbolDict[SYMBOL['symbol']]['relatedSymbol'][RELATEDSYMBOLS['symbol']] =1
+
+# convert relatedSymbol subDict to a sorted list relatedSymbolList
+for STOCK in symbolDict:
+    symbolDict[STOCK]['relatedSymbolList'] = []
+    for relatedSymbols in symbolDict[STOCK]['relatedSymbol']:
+        symbolDict[STOCK]['relatedSymbolList'].append({'name': relatedSymbols, 'count': symbolDict[STOCK]['relatedSymbol'][relatedSymbols]})
+    symbolDict[STOCK]['relatedSymbolList'].sort(key = lambda x: x['count'], reverse = True)
+    del symbolDict[STOCK]['relatedSymbolList'][5:]    # truncate relatedSymbolList, leave at most 5 related symbols.
+    del symbolDict[STOCK]['relatedSymbol']    # delete a key value pair in dictionary
 
 #convert dict to object and store objects into a list
 symbolList = []    #This is a list of objects
@@ -44,11 +62,11 @@ for TICKER in symbolDict:
 #for ticker in symbolDict:
 #    print (symbolDict[ticker]["symbol"], symbolDict[ticker]["count"])    #print generated symbolDict
 
-#with open('symbolDict.json', 'w') as f:
-#    json.dump(symbolDict, f, sort_keys=True, indent=4)
-#    for item in symbolDict.items():
-#        json.dump(item, f)
-#        f.write('\n')
+with open('symbolDict.json', 'w') as f:
+    json.dump(symbolDict, f, sort_keys=True, indent=4)
+    for item in symbolDict.items():
+        json.dump(item, f)
+        f.write('\n')
 
 symbolList.sort(key = lambda x: x.count, reverse = True)
 #try not convert to object, just use x['count'] to sort next time.
@@ -63,11 +81,17 @@ for i in range(0,10):
 #    print (symbolList[i].symbol)
     symbolSorted.append(symbolDict[symbolList[i].symbol])
     if symbolList[i].sector in sectorDict:
-        sectorDict[symbolList[i].sector].append({'name': symbolDict[symbolList[i].symbol]['symbol'], 'value': symbolDict[symbolList[i].symbol]['count']})
+        sectorDict[symbolList[i].sector].append({'name': symbolDict[symbolList[i].symbol]['symbol'],
+                                                 'value': symbolDict[symbolList[i].symbol]['count'],
+                                                 'title': symbolDict[symbolList[i].symbol]['title'],
+                                                 'relatedSymbols': symbolDict[symbolList[i].symbol]['relatedSymbolList']})
 #        sectorDict[symbolList[i].sector].append(symbolDict[symbolList[i].symbol])
     else:
         sectorDict[symbolList[i].sector] = []
-        sectorDict[symbolList[i].sector].append({'name': symbolDict[symbolList[i].symbol]['symbol'], 'value': symbolDict[symbolList[i].symbol]['count']})
+        sectorDict[symbolList[i].sector].append({'name': symbolDict[symbolList[i].symbol]['symbol'],
+                                                 'value': symbolDict[symbolList[i].symbol]['count'],
+                                                 'title': symbolDict[symbolList[i].symbol]['title'],
+                                                 'relatedSymbols': symbolDict[symbolList[i].symbol]['relatedSymbolList']})
 
 #print ("sectorDict length:", len(sectorDict))
 
