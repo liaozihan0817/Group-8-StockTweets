@@ -37,8 +37,9 @@ for i in range(0, 7999):
 for STOCK in symbolDict:
     symbolDict[STOCK]['relatedSymbolList'] = []
     for relatedSymbols in symbolDict[STOCK]['relatedSymbol']:
-        symbolDict[STOCK]['relatedSymbolList'].append({'name': relatedSymbols, 'count': symbolDict[STOCK]['relatedSymbol'][relatedSymbols]})
-    symbolDict[STOCK]['relatedSymbolList'].sort(key = lambda x: x['count'], reverse = True)
+        symbolDict[STOCK]['relatedSymbolList'].append({'name': relatedSymbols,
+                                                       'relate_count': symbolDict[STOCK]['relatedSymbol'][relatedSymbols]})
+    symbolDict[STOCK]['relatedSymbolList'].sort(key = lambda x: x['relate_count'], reverse = True)
     del symbolDict[STOCK]['relatedSymbolList'][5:]    # truncate relatedSymbolList, leave at most 5 related symbols.
     del symbolDict[STOCK]['relatedSymbol']    # delete a key value pair in dictionary
 
@@ -84,6 +85,7 @@ for i in range(0,10):
         sectorDict[symbolList[i].sector].append({'name': symbolDict[symbolList[i].symbol]['symbol'],
                                                  'value': symbolDict[symbolList[i].symbol]['count'],
                                                  'title': symbolDict[symbolList[i].symbol]['title'],
+                                                 'exchange': symbolDict[symbolList[i].symbol]['exchange'],
                                                  'relatedSymbols': symbolDict[symbolList[i].symbol]['relatedSymbolList']})
 #        sectorDict[symbolList[i].sector].append(symbolDict[symbolList[i].symbol])
     else:
@@ -91,6 +93,7 @@ for i in range(0,10):
         sectorDict[symbolList[i].sector].append({'name': symbolDict[symbolList[i].symbol]['symbol'],
                                                  'value': symbolDict[symbolList[i].symbol]['count'],
                                                  'title': symbolDict[symbolList[i].symbol]['title'],
+                                                 'exchange': symbolDict[symbolList[i].symbol]['exchange'],
                                                  'relatedSymbols': symbolDict[symbolList[i].symbol]['relatedSymbolList']})
 
 #print ("sectorDict length:", len(sectorDict))
